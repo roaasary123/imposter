@@ -7,17 +7,17 @@ import com.example.data.AppDatabase
 import com.example.data.CustomCategoryEntity
 import com.example.data.CustomWordEntity
 import com.example.data.DefaultCategories
+import com.example.data.NameGroupEntity
+import com.example.data.NameGroupMemberEntity
 import com.example.model.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = AppDatabase.getDatabase(application)
     private val categoryDao = db.categoryDao()
+    private val nameGroupDao = db.nameGroupDao()
 
     // Navigation & State
     private val _currentScreen = MutableStateFlow(AppScreen.HOME)
@@ -57,31 +57,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val _isRoleCardFlipped = MutableStateFlow(false)
     val isRoleCardFlipped: StateFlow<Boolean> = _isRoleCardFlipped.asStateFlow()
 
-    // Timer State
-    private val _timerSeconds = MutableStateFlow(180)
-    val timerSeconds: StateFlow<Int> = _timerSeconds.asStateFlow()
-
-    private val _isTimerRunning = MutableStateFlow(false)
-    val isTimerRunning: StateFlow<Boolean> = _isTimerRunning.asStateFlow()
-
-    private var timerJob: Job? = null
-
-    // Discussion Question Helper
-    private val _currentQuestion = MutableStateFlow("")
-    val currentQuestion: StateFlow<String> = _currentQuestion.asStateFlow()
-
-    // Voting State
-    private val _selectedSuspect = MutableStateFlow<Player?>(null)
-    val selectedSuspect: StateFlow<Player?> = _selectedSuspect.asStateFlow()
-
-    private val _imposterGuessOptions = MutableStateFlow<List<String>>(emptyList())
-    val imposterGuessOptions: StateFlow<List<String>> = _imposterGuessOptions.asStateFlow()
-
-    private val _imposterGuessedWord = MutableStateFlow<String?>(null)
-    val imposterGuessedWord: StateFlow<String?> = _imposterGuessedWord.asStateFlow()
-
     // Results State
-    private val _gameWinner = MutableStateFlow<String?>(null) // "INNOCENTS" or "IMPOSTER"
+    private val _gameWinner = MutableStateFlow<String?>(null)
     val gameWinner: StateFlow<String?> = _gameWinner.asStateFlow()
 
     private val _winReason = MutableStateFlow("")
@@ -110,6 +87,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     ) { builtin, custom ->
         builtin + custom
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DefaultCategories.BUILTIN_CATEGORIES)
+
+    // Name Groups
+    val nameGroups: StateFlow<List<NameGroupEntity>> = nameGroupDao.getAllGroups()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun navigateTo(screen: AppScreen) {
         _currentScreen.value = screen
@@ -146,14 +127,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         _settings.value = _settings.value.copy(enableHint = enabled)
     }
 
-    fun updateTimerMinutes(minutes: Int) {
-        _settings.value = _settings.value.copy(timerMinutes = minutes)
-    }
-
     fun toggleCategorySelection(categoryId: String) {
         val selected = _settings.value.selectedCategoryIds.toMutableSet()
         if (selected.contains(categoryId)) {
-            if (selected.size > 1) { // keep at least one category selected
+            if (selected.size > 1) {
                 selected.remove(categoryId)
             }
         } else {
@@ -170,22 +147,55 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun loadPlayerNames(names: List<String>) {
+        if (names.size >= 3) {
+            _playerNames.value = names
+            _settings.value = _settings.value.copy(playerCount = names.size)
+        }
+    }
+
+    // --- Name Group Functions ---
+    fun saveNameGroup(name: String) {
+        viewModelScope.launch {
+            val group = NameGroupEntity(name = name)
+            val groupId = nameGroupDao.insertGroup(group)
+            val members = _playerNames.value.mapIndexed { idx, playerName ->
+                NameGroupMemberEntity(groupId = groupId, name = playerName, sortOrder = idx)
+            }
+            nameGroupDao.insertMembers(members)
+        }
+    }
+
+    fun deleteNameGroup(group: NameGroupEntity) {
+        viewModelScope.launch {
+            nameGroupDao.deleteMembersForGroup(group.id)
+            nameGroupDao.deleteGroup(group)
+        }
+    }
+
+    fun loadGroupMembers(group: NameGroupEntity) {
+        viewModelScope.launch {
+            val members = nameGroupDao.getMembersForGroup(group.id)
+            val names = members.sortedBy { it.sortOrder }.map { it.name }
+            if (names.size >= 3) {
+                loadPlayerNames(names)
+            }
+        }
+    }
+
     // --- Game Logic ---
     fun startNewGame() {
         viewModelScope.launch {
-            // Pick a word from selected categories
             val selectedCategoryIds = _settings.value.selectedCategoryIds
             val candidateWords = mutableListOf<SecretWordItem>()
             var chosenCategoryName = ""
 
-            // Gather builtin candidate words
             for (catId in selectedCategoryIds) {
                 DefaultCategories.BUILTIN_WORDS[catId]?.let { words ->
                     candidateWords.addAll(words)
                 }
             }
 
-            // Gather custom candidate words from Room DB
             for (catId in selectedCategoryIds) {
                 val dbWords = categoryDao.getWordsForCategory(catId)
                 if (dbWords.isNotEmpty()) {
@@ -196,7 +206,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             if (candidateWords.isEmpty()) {
-                // Fallback if somehow empty
                 val fallbackWord = DefaultCategories.BUILTIN_WORDS["foods"]!!.random()
                 candidateWords.add(fallbackWord)
             }
@@ -205,12 +214,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             _secretWord.value = chosenWordItem.word
             _imposterHint.value = chosenWordItem.hint
 
-            // Find category display name
             val allCatList = allCategories.value
             chosenCategoryName = allCatList.find { it.id == chosenWordItem.categoryId }?.name ?: "تصنيف عام"
             _secretCategoryName.value = chosenCategoryName
 
-            // Create players list with current scores preserved if restarting
             val names = _playerNames.value
             val existingScores = _players.value.associate { it.name to it.score }
 
@@ -224,7 +231,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
 
-            // Assign Imposter role(s) randomly
             val imposterIndices = newPlayers.indices.shuffled().take(_settings.value.imposterCount).toSet()
 
             val hintToGive = if (_settings.value.enableHint) chosenWordItem.hint else null
@@ -240,24 +246,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
             _players.value = assignedPlayers
 
-            // Pick random discussion starter
             _discussionStarter.value = assignedPlayers.random()
 
-            // Reset reveal phase
             _currentRevealIndex.value = 0
             _isRoleCardFlipped.value = false
 
-            // Reset timer
-            _timerSeconds.value = _settings.value.timerMinutes * 60
-            _isTimerRunning.value = false
-
-            // Reset voting and results
-            _selectedSuspect.value = null
-            _imposterGuessedWord.value = null
             _gameWinner.value = null
             _winReason.value = ""
 
-            // Navigate to Role Reveal
             _currentScreen.value = AppScreen.ROLE_REVEAL
         }
     }
@@ -272,114 +268,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (nextIdx < _players.value.size) {
             _currentRevealIndex.value = nextIdx
         } else {
-            // All players revealed! Start discussion phase
             _currentScreen.value = AppScreen.DISCUSSION
-            if (_settings.value.timerMinutes > 0) {
-                startTimer()
-            }
         }
-    }
-
-    // --- Discussion & Timer ---
-    fun startTimer() {
-        timerJob?.cancel()
-        _isTimerRunning.value = true
-        timerJob = viewModelScope.launch {
-            while (_timerSeconds.value > 0 && _isTimerRunning.value) {
-                delay(1000)
-                _timerSeconds.value -= 1
-            }
-            if (_timerSeconds.value == 0) {
-                _isTimerRunning.value = false
-            }
-        }
-    }
-
-    fun pauseTimer() {
-        _isTimerRunning.value = false
-        timerJob?.cancel()
-    }
-
-    fun resetTimer() {
-        pauseTimer()
-        _timerSeconds.value = _settings.value.timerMinutes * 60
-    }
-
-    fun addTimerMinute() {
-        _timerSeconds.value += 60
-    }
-
-    fun generateNewQuestion() {
-        // Questions removed per user request for simplicity
-    }
-
-    // --- Voting & Guessing ---
-    fun prepareVoting() {
-        pauseTimer()
-        _selectedSuspect.value = null
-        _currentScreen.value = AppScreen.VOTING
-    }
-
-    fun selectSuspect(player: Player) {
-        _selectedSuspect.value = player
-    }
-
-    fun prepareImposterGuessOptions() {
-        val currentSecret = _secretWord.value
-        val categoryWords = mutableListOf<String>()
-
-        // Gather decoys
-        DefaultCategories.BUILTIN_WORDS.values.flatten().forEach { categoryWords.add(it.word) }
-
-        val decoys = categoryWords.filter { it != currentSecret }.shuffled().take(3)
-        val options = (decoys + currentSecret).shuffled()
-        _imposterGuessOptions.value = options
-    }
-
-    fun confirmVotingResult(imposterGuessedWord: String? = null) {
-        val suspect = _selectedSuspect.value ?: return
-        val isSuspectImposter = suspect.role is PlayerRole.Imposter
-
-        val currentWord = _secretWord.value
-        val playersList = _players.value.toMutableList()
-
-        if (isSuspectImposter) {
-            // Innocents caught an imposter!
-            if (imposterGuessedWord != null && imposterGuessedWord.trim() == currentWord.trim()) {
-                // Imposter guessed the secret word correctly and stole the win!
-                _gameWinner.value = "IMPOSTER"
-                _winReason.value = "كشف الأبرياء الجاسوس، لكن الجاسوس خمن الكلمة السرية (${currentWord}) بنجاح وسرق الفوز!"
-
-                // Award points to imposter(s)
-                val updatedPlayers = playersList.map { p ->
-                    if (p.role is PlayerRole.Imposter) p.copy(score = p.score + 3) else p
-                }
-                _players.value = updatedPlayers
-            } else {
-                // Innocents win!
-                _gameWinner.value = "INNOCENTS"
-                _winReason.value = "نجح الأبرياء في كشف الجاسوس (${suspect.name}) ولم يستطع تخمين الكلمة السرية!"
-
-                // Award points to innocents
-                val updatedPlayers = playersList.map { p ->
-                    if (p.role is PlayerRole.Innocent) p.copy(score = p.score + 2) else p
-                }
-                _players.value = updatedPlayers
-            }
-        } else {
-            // Innocents voted out an innocent player! Imposter wins!
-            _gameWinner.value = "IMPOSTER"
-            val imposterNames = playersList.filter { it.role is PlayerRole.Imposter }.joinToString(", ") { it.name }
-            _winReason.value = "صوت الأبرياء ضد لاعب بريء (${suspect.name})! فاز الجاسوس (${imposterNames}) بالخدعة!"
-
-            // Award points to imposter(s)
-            val updatedPlayers = playersList.map { p ->
-                if (p.role is PlayerRole.Imposter) p.copy(score = p.score + 3) else p
-            }
-            _players.value = updatedPlayers
-        }
-
-        _currentScreen.value = AppScreen.RESULT
     }
 
     // --- Custom Category Database Operations ---
@@ -405,7 +295,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            // Auto-select newly added custom category
             toggleCategorySelection(catId)
         }
     }
@@ -416,7 +305,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             categoryDao.deleteWordsForCategory(categoryId)
             categoryDao.deleteCategory(categoryEntity)
 
-            // Remove from selected set if present
             val selected = _settings.value.selectedCategoryIds.toMutableSet()
             selected.remove(categoryId)
             if (selected.isEmpty()) {

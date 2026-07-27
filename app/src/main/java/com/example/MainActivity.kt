@@ -31,20 +31,20 @@ class MainActivity : ComponentActivity() {
                 val discussionStarter by viewModel.discussionStarter.collectAsState()
                 val currentRevealIndex by viewModel.currentRevealIndex.collectAsState()
                 val isRoleCardFlipped by viewModel.isRoleCardFlipped.collectAsState()
-                val timerSeconds by viewModel.timerSeconds.collectAsState()
-                val isTimerRunning by viewModel.isTimerRunning.collectAsState()
-                val currentQuestion by viewModel.currentQuestion.collectAsState()
-                val selectedSuspect by viewModel.selectedSuspect.collectAsState()
-                val imposterGuessOptions by viewModel.imposterGuessOptions.collectAsState()
                 val gameWinner by viewModel.gameWinner.collectAsState()
                 val winReason by viewModel.winReason.collectAsState()
                 val allCategories by viewModel.allCategories.collectAsState()
                 val customCategories by viewModel.customCategories.collectAsState()
+                val nameGroups by viewModel.nameGroups.collectAsState()
 
                 when (currentScreen) {
                     AppScreen.HOME -> HomeScreen(
                         players = activePlayers,
-                        onNavigateTo = { viewModel.navigateTo(it) }
+                        nameGroups = nameGroups,
+                        onNavigateTo = { viewModel.navigateTo(it) },
+                        onSaveNameGroup = { name -> viewModel.saveNameGroup(name) },
+                        onDeleteNameGroup = { group -> viewModel.deleteNameGroup(group) },
+                        onLoadGroupMembers = { group -> viewModel.loadGroupMembers(group) }
                     )
 
                     AppScreen.SETUP -> GameSetupScreen(
@@ -54,7 +54,6 @@ class MainActivity : ComponentActivity() {
                         onUpdatePlayerCount = { viewModel.updatePlayerCount(it) },
                         onUpdateImposterCount = { viewModel.updateImposterCount(it) },
                         onToggleHintEnabled = { viewModel.toggleHintEnabled(it) },
-                        onUpdateTimerMinutes = { viewModel.updateTimerMinutes(it) },
                         onToggleCategorySelection = { viewModel.toggleCategorySelection(it) },
                         onUpdatePlayerName = { idx, name -> viewModel.updatePlayerName(idx, name) },
                         onStartGame = { viewModel.startNewGame() },
@@ -71,24 +70,12 @@ class MainActivity : ComponentActivity() {
 
                     AppScreen.DISCUSSION -> DiscussionScreen(
                         starterPlayer = discussionStarter,
-                        timerSeconds = timerSeconds,
-                        isTimerRunning = isTimerRunning,
-                        currentQuestion = currentQuestion,
-                        onStartTimer = { viewModel.startTimer() },
-                        onPauseTimer = { viewModel.pauseTimer() },
-                        onResetTimer = { viewModel.resetTimer() },
-                        onAddTimerMinute = { viewModel.addTimerMinute() },
-                        onGenerateNewQuestion = { viewModel.generateNewQuestion() },
-                        onProceedToVoting = { viewModel.prepareVoting() }
-                    )
-
-                    AppScreen.VOTING -> VotingScreen(
                         players = activePlayers,
-                        selectedSuspect = selectedSuspect,
-                        imposterGuessOptions = imposterGuessOptions,
-                        onSelectSuspect = { viewModel.selectSuspect(it) },
-                        onPrepareImposterGuessOptions = { viewModel.prepareImposterGuessOptions() },
-                        onConfirmVotingResult = { word -> viewModel.confirmVotingResult(word) }
+                        secretWord = secretWord,
+                        imposterHint = imposterHint,
+                        onStartNewRound = { viewModel.startNewGame() },
+                        onNavigateToSettings = { viewModel.navigateTo(AppScreen.SETUP) },
+                        onNavigateToHome = { viewModel.navigateTo(AppScreen.HOME) }
                     )
 
                     AppScreen.RESULT -> ResultScreen(

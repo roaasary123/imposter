@@ -30,7 +30,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -48,7 +47,6 @@ fun GameSetupScreen(
     onUpdatePlayerCount: (Int) -> Unit,
     onUpdateImposterCount: (Int) -> Unit,
     onToggleHintEnabled: (Boolean) -> Unit,
-    onUpdateTimerMinutes: (Int) -> Unit,
     onToggleCategorySelection: (String) -> Unit,
     onUpdatePlayerName: (Int, String) -> Unit,
     onStartGame: () -> Unit,
@@ -214,18 +212,11 @@ fun GameSetupScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "عدد الجواسيس",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = TextPrimary
-                            )
-                            Text(
-                                text = "يفضل 1 للجماعات الصغيرة و 2 للكبيرة",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary
-                            )
-                        }
+                        Text(
+                            text = "عدد الجواسيس",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = TextPrimary
+                        )
 
                         CounterControl(
                             value = settings.imposterCount,
@@ -293,65 +284,6 @@ fun GameSetupScreen(
                             )
                         }
 
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = DarkSurfaceVariant.copy(alpha = 0.5f)
-                        ) {
-                            Text(
-                                text = if (settings.enableHint)
-                                    "عند التفعيل: يحصل الجاسوس على تلميح غير مباشر وبطريقة بعيدة تسمح بالتفكير دون كشف الكلمة بوضوح."
-                                else
-                                    "عند التعطيل: يرى الجاسوس رسالة «أنت الجاسوس!» فقط بدون أي تلميح.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary,
-                                modifier = Modifier.padding(12.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                SetupSectionCard {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(
-                            text = "مدة المؤقت",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = TextPrimary
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            listOf(
-                                1 to "1 د",
-                                2 to "2 د",
-                                3 to "3 د",
-                                5 to "5 د",
-                                0 to "بدون وقت"
-                            ).forEach { (minutes, label) ->
-                                val isSelected = settings.timerMinutes == minutes
-                                FilterChip(
-                                    selected = isSelected,
-                                    onClick = { onUpdateTimerMinutes(minutes) },
-                                    label = {
-                                        Text(
-                                            text = label,
-                                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                            fontSize = MaterialTheme.typography.labelMedium.fontSize
-                                        )
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = PrimaryAccent,
-                                        selectedLabelColor = TextPrimary,
-                                        containerColor = DarkSurfaceVariant,
-                                        labelColor = TextPrimary
-                                    )
-                                )
-                            }
-                        }
                     }
                 }
             }
@@ -363,12 +295,6 @@ fun GameSetupScreen(
                             text = "اختر تصنيفات الكلمات",
                             style = MaterialTheme.typography.bodyLarge,
                             color = TextPrimary
-                        )
-
-                        Text(
-                            text = "يمكنك اختيار أكثر من تصنيف للجولة الواحدة:",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary
                         )
 
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

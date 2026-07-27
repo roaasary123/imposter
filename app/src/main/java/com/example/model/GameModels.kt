@@ -5,7 +5,6 @@ enum class AppScreen {
     SETUP,
     ROLE_REVEAL,
     DISCUSSION,
-    VOTING,
     RESULT,
     CUSTOM_CATEGORIES
 }
@@ -42,6 +41,5 @@ data class GameSettings(
     val playerCount: Int = 4,
     val imposterCount: Int = 1,
     val enableHint: Boolean = true,
-    val timerMinutes: Int = 3, // 0 for unlimited
     val selectedCategoryIds: Set<String> = setOf("foods", "cities", "animals", "jobs")
 )

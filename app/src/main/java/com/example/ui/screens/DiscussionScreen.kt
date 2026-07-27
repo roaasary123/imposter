@@ -5,51 +5,158 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.HowToVote
-import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.model.Player
+import com.example.model.PlayerRole
 import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscussionScreen(
     starterPlayer: Player?,
-    timerSeconds: Int,
-    isTimerRunning: Boolean,
-    currentQuestion: String = "",
-    onStartTimer: () -> Unit,
-    onPauseTimer: () -> Unit,
-    onResetTimer: () -> Unit,
-    onAddTimerMinute: () -> Unit,
-    onGenerateNewQuestion: () -> Unit = {},
-    onProceedToVoting: () -> Unit
+    players: List<Player>,
+    secretWord: String,
+    imposterHint: String?,
+    onStartNewRound: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    onNavigateToHome: () -> Unit
 ) {
-    val minutes = timerSeconds / 60
-    val seconds = timerSeconds % 60
-    val timeFormatted = String.format("%02d:%02d", minutes, seconds)
+    var showRevealDialog by remember { mutableStateOf(false) }
+
+    if (showRevealDialog) {
+        AlertDialog(
+            onDismissRequest = { showRevealDialog = false },
+            title = {
+                Text(
+                    text = "كشف الكلمة والجاسوس",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = PrimaryAccent.copy(alpha = 0.15f)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "الكلمة السرية",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = TextSecondary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = secretWord,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = PrimaryAccentLight,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    if (imposterHint != null) {
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = GoldPrimary.copy(alpha = 0.15f)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = "التلميح",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = TextSecondary
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = imposterHint,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = GoldLight
+                                )
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = "هوية الجواسيس",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = TextSecondary
+                    )
+
+                    players.forEach { player ->
+                        val isImposter = player.role is PlayerRole.Imposter
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = if (isImposter) ImposterRedContainer else DarkSurfaceVariant
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = null,
+                                        tint = if (isImposter) ImposterRed else TextPrimary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Text(
+                                        text = player.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = TextPrimary,
+                                        fontWeight = if (isImposter) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
+                                Text(
+                                    text = if (isImposter) "جاسوس" else "بريء",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = if (isImposter) ImposterRed else InnocentGreen,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showRevealDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryAccent, contentColor = TextPrimary),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text(text = "حسناً", fontWeight = FontWeight.SemiBold)
+                }
+            },
+            containerColor = DarkSurface,
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "مرحلة النقاش",
+                        text = "مزيد من الخيارات",
                         style = MaterialTheme.typography.titleLarge,
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold
@@ -57,49 +164,6 @@ fun DiscussionScreen(
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = DarkBackground)
             )
-        },
-        bottomBar = {
-            Surface(
-                color = DarkSurface,
-                tonalElevation = 0.dp
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                ) {
-                    Button(
-                        onClick = onProceedToVoting,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                            .testTag("proceed_to_voting_button"),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryAccent,
-                            contentColor = TextPrimary
-                        ),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.HowToVote,
-                                contentDescription = null,
-                                tint = TextPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Text(
-                                text = "الانتقال للتصويت والتخمين",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.SemiBold,
-                                color = TextPrimary
-                            )
-                        }
-                    }
-                }
-            }
         },
         containerColor = DarkBackground
     ) { padding ->
@@ -154,93 +218,123 @@ fun DiscussionScreen(
                 }
             }
 
-            Surface(
-                shape = RoundedCornerShape(20.dp),
-                color = DarkSurface,
-                modifier = Modifier.fillMaxWidth()
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = { showRevealDialog = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryAccent,
+                    contentColor = TextPrimary
+                ),
+                shape = RoundedCornerShape(14.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Visibility,
+                        contentDescription = null,
+                        tint = TextPrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = "عرض الكلمة والجاسوس",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onStartNewRound,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Timer,
+                            imageVector = Icons.Default.Replay,
                             contentDescription = null,
                             tint = PrimaryAccentLight,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                         Text(
-                            text = "مؤقت النقاش",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = TextSecondary
+                            text = "جولة جديدة بنفس الإعدادات",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
+                }
 
-                    Text(
-                        text = timeFormatted,
-                        style = MaterialTheme.typography.displayLarge.copy(
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = if (timerSeconds <= 30 && timerSeconds > 0) ImposterRed else PrimaryAccentLight,
-                        textAlign = TextAlign.Center
-                    )
-
+                OutlinedButton(
+                    onClick = onNavigateToSettings,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
+                ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        IconButton(
-                            onClick = { if (isTimerRunning) onPauseTimer() else onStartTimer() },
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(PrimaryAccent)
-                        ) {
-                            Icon(
-                                imageVector = if (isTimerRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
-                                contentDescription = if (isTimerRunning) "إيقاف مؤقت" else "تشغيل",
-                                tint = TextPrimary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = null,
+                            tint = PrimaryAccentLight,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = "الإعدادات",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
 
-                        IconButton(
-                            onClick = onResetTimer,
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(CircleShape)
-                                .background(DarkSurfaceVariant)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "إعادة ضبط",
-                                tint = TextPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-
-                        OutlinedButton(
-                            onClick = onAddTimerMinute,
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(2.dp)
-                            ) {
-                                Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
-                                Text(text = "1 د", style = MaterialTheme.typography.labelMedium)
-                            }
-                        }
+                OutlinedButton(
+                    onClick = onNavigateToHome,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = null,
+                            tint = PrimaryAccentLight,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = "الرئيسية",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }

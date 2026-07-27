@@ -6,12 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [CustomCategoryEntity::class, CustomWordEntity::class],
-    version = 1,
+    entities = [CustomCategoryEntity::class, CustomWordEntity::class, NameGroupEntity::class, NameGroupMemberEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
+    abstract fun nameGroupDao(): NameGroupDao
 
     companion object {
         @Volatile
@@ -23,7 +24,8 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "imposter_game_database"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
