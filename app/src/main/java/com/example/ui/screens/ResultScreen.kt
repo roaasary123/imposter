@@ -3,7 +3,6 @@ package com.example.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,8 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -50,69 +47,18 @@ fun ResultScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // Winner Header Card
-            item {
-                Surface(
-                    shape = RoundedCornerShape(28.dp),
-                    color = if (isImposterWinner) ImposterRedContainer else InnocentGreenContainer,
-                    border = androidx.compose.foundation.BorderStroke(
-                        2.dp,
-                        if (isImposterWinner) ImposterRed else InnocentGreen
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(64.dp)
-                                .background(
-                                    if (isImposterWinner) ImposterRed.copy(alpha = 0.2f) else InnocentGreen.copy(alpha = 0.2f),
-                                    CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = if (isImposterWinner) Icons.Default.Security else Icons.Default.Check,
-                                contentDescription = null,
-                                tint = if (isImposterWinner) ImposterRed else InnocentGreen,
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
-
-                        Text(
-                            text = if (isImposterWinner) "فاز الجاسوس" else "فاز الأبرياء",
-                            style = MaterialTheme.typography.displayMedium,
-                            color = if (isImposterWinner) ImposterRed else InnocentGreen,
-                            fontWeight = FontWeight.Black,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Text(
-                            text = winReason,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = TextPrimary,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 22.sp
-                        )
-                    }
-                }
-            }
-
-            // Secret Word & Category Reveal
             item {
                 Surface(
                     shape = RoundedCornerShape(24.dp),
-                    color = DarkSurface,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
+                    color = if (isImposterWinner) ImposterRedContainer else InnocentGreenContainer,
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.5.dp,
+                        if (isImposterWinner) ImposterRed else InnocentGreen
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
@@ -120,50 +66,94 @@ fun ResultScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (isImposterWinner) ImposterRed.copy(alpha = 0.15f) else InnocentGreen.copy(alpha = 0.15f)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (isImposterWinner) Icons.Default.Security else Icons.Default.Check,
+                                contentDescription = null,
+                                tint = if (isImposterWinner) ImposterRed else InnocentGreen,
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+
+                        Text(
+                            text = if (isImposterWinner) "فاز الجاسوس" else "فاز الأبرياء",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = if (isImposterWinner) ImposterRed else InnocentGreen,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Text(
+                            text = winReason,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextPrimary,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+
+            item {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = DarkSurface,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(18.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(
                             text = "الكلمة السرية في هذه الجولة:",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary
                         )
 
                         Text(
                             text = secretWord,
-                            style = MaterialTheme.typography.displayMedium,
+                            style = MaterialTheme.typography.headlineMedium,
                             color = PrimaryAccentLight,
-                            fontWeight = FontWeight.Black,
+                            fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
                         )
 
                         Surface(
                             color = DarkSurfaceVariant,
-                            shape = RoundedCornerShape(14.dp)
+                            shape = RoundedCornerShape(10.dp)
                         ) {
                             Text(
                                 text = "التصنيف: $categoryName",
-                                style = MaterialTheme.typography.labelLarge,
+                                style = MaterialTheme.typography.labelMedium,
                                 color = TextPrimary,
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                             )
                         }
                     }
                 }
             }
 
-            // Imposter Identity Reveal
             item {
                 Surface(
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(20.dp),
                     color = DarkSurface,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
                             text = "هوية الجاسوس:",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             color = ImposterRed,
                             fontWeight = FontWeight.Bold
                         )
@@ -171,26 +161,27 @@ fun ResultScreen(
                         players.filter { it.role is PlayerRole.Imposter }.forEach { imp ->
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(38.dp)
-                                        .background(ImposterRedContainer, CircleShape),
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(ImposterRedContainer),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Security,
                                         contentDescription = null,
                                         tint = ImposterRed,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(16.dp)
                                     )
                                 }
                                 Text(
                                     text = imp.name,
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     color = TextPrimary,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.SemiBold
                                 )
                             }
                         }
@@ -198,31 +189,29 @@ fun ResultScreen(
                 }
             }
 
-            // Scores Table
             item {
                 Surface(
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(20.dp),
                     color = DarkSurface,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Leaderboard,
                                 contentDescription = null,
                                 tint = GoldLight,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                             Text(
                                 text = "مجموع النقاط الحالية",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.titleSmall,
                                 color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -236,35 +225,35 @@ fun ResultScreen(
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .size(32.dp)
+                                            .size(26.dp)
+                                            .clip(CircleShape)
                                             .background(
-                                                if (idx == 0) GoldPrimary else DarkSurfaceVariant,
-                                                CircleShape
+                                                if (idx == 0) GoldPrimary else DarkSurfaceVariant
                                             ),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             text = "${idx + 1}",
-                                            style = MaterialTheme.typography.labelLarge,
+                                            style = MaterialTheme.typography.labelSmall,
                                             color = if (idx == 0) DarkBackground else TextPrimary,
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
                                     Text(
                                         text = p.name,
-                                        style = MaterialTheme.typography.bodyLarge,
+                                        style = MaterialTheme.typography.bodyMedium,
                                         color = TextPrimary,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontWeight = FontWeight.Medium
                                     )
                                 }
 
                                 Text(
                                     text = "${p.score} نقطة",
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.titleSmall,
                                     color = GoldLight,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -274,70 +263,54 @@ fun ResultScreen(
                 }
             }
 
-            // Action CTAs
             item {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Button(
                         onClick = onPlayAgain,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(60.dp)
-                            .shadow(12.dp, RoundedCornerShape(20.dp), spotColor = PrimaryAccent)
+                            .height(52.dp)
                             .testTag("play_again_button"),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
+                            containerColor = PrimaryAccent,
                             contentColor = TextPrimary
                         ),
-                        contentPadding = PaddingValues(),
-                        shape = RoundedCornerShape(20.dp)
+                        shape = RoundedCornerShape(14.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.horizontalGradient(
-                                        colors = listOf(PrimaryAccent, CyberCyan)
-                                    )
-                                ),
-                            contentAlignment = Alignment.Center
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Icon(imageVector = Icons.Default.Refresh, contentDescription = null, tint = TextPrimary)
-                                Text(
-                                    text = "جولة جديدة بنفس الإعدادات",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextPrimary
-                                )
-                            }
+                            Icon(imageVector = Icons.Default.Refresh, contentDescription = null, tint = TextPrimary, modifier = Modifier.size(18.dp))
+                            Text(
+                                text = "جولة جديدة بنفس الإعدادات",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
+                            )
                         }
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         OutlinedButton(
                             onClick = { onNavigateTo(AppScreen.SETUP) },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(52.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(18.dp))
-                                Text(text = "الإعدادات")
+                                Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Text(text = "الإعدادات", style = MaterialTheme.typography.labelLarge)
                             }
                         }
 
@@ -345,17 +318,15 @@ fun ResultScreen(
                             onClick = { onNavigateTo(AppScreen.HOME) },
                             modifier = Modifier
                                 .weight(1f)
-                                .height(52.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass)
+                                .height(48.dp),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Icon(imageVector = Icons.Default.Home, contentDescription = null, modifier = Modifier.size(18.dp))
-                                Text(text = "الرئيسية")
+                                Icon(imageVector = Icons.Default.Home, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Text(text = "الرئيسية", style = MaterialTheme.typography.labelLarge)
                             }
                         }
                     }
@@ -364,5 +335,3 @@ fun ResultScreen(
         }
     }
 }
-
-

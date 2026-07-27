@@ -1,7 +1,6 @@
 package com.example.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,24 +9,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.model.CategoryItem
 import com.example.ui.theme.*
 
@@ -49,7 +42,7 @@ fun CustomCategoriesScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = "التصنيفات المخصصة",
@@ -67,7 +60,7 @@ fun CustomCategoriesScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBackground)
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = DarkBackground)
             )
         },
         floatingActionButton = {
@@ -75,14 +68,12 @@ fun CustomCategoriesScreen(
                 onClick = { showAddDialog = true },
                 containerColor = PrimaryAccent,
                 contentColor = TextPrimary,
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier
-                    .shadow(12.dp, RoundedCornerShape(20.dp), spotColor = PrimaryAccent)
-                    .testTag("add_custom_category_fab")
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.testTag("add_custom_category_fab")
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = TextPrimary)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "إضافة تصنيف جديد", fontWeight = FontWeight.Bold, color = TextPrimary)
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(text = "إضافة تصنيف جديد", fontWeight = FontWeight.SemiBold, color = TextPrimary)
             }
         },
         containerColor = DarkBackground
@@ -92,21 +83,19 @@ fun CustomCategoriesScreen(
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             item {
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(16.dp),
                     color = DarkSurface,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "ابتكر تصنيفاتك الخاصة وكلماتك السرية المخصصة مع تلميحات خاصة للعب مع العائلة والأصدقاء!",
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = TextSecondary,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(14.dp)
                     )
                 }
             }
@@ -124,18 +113,18 @@ fun CustomCategoriesScreen(
                                 imageVector = Icons.Default.Folder,
                                 contentDescription = null,
                                 tint = TextMuted,
-                                modifier = Modifier.size(56.dp)
+                                modifier = Modifier.size(48.dp)
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(10.dp))
                             Text(
                                 text = "لا توجد تصنيفات مخصصة حتى الآن",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.titleSmall,
                                 color = TextSecondary
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = "اضغط على زر الإضافة بالأسفل لإنشاء تصنيفك الأول!",
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodySmall,
                                 color = TextMuted
                             )
                         }
@@ -144,42 +133,42 @@ fun CustomCategoriesScreen(
             } else {
                 items(customCategories) { cat ->
                     Surface(
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(16.dp),
                         color = DarkSurface,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(46.dp)
-                                        .background(PrimaryAccent.copy(alpha = 0.2f), CircleShape),
+                                        .size(40.dp)
+                                        .clip(CircleShape)
+                                        .background(PrimaryAccent.copy(alpha = 0.15f)),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Folder,
                                         contentDescription = null,
                                         tint = PrimaryAccentLight,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
 
                                 Column {
                                     Text(
                                         text = cat.name,
-                                        style = MaterialTheme.typography.titleMedium,
+                                        style = MaterialTheme.typography.bodyLarge,
                                         color = TextPrimary,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.SemiBold
                                     )
                                     Text(
                                         text = "${cat.wordCount} كلمة مخصصة",
@@ -205,21 +194,20 @@ fun CustomCategoriesScreen(
         }
     }
 
-    // Add Custom Category Modal
     if (showAddDialog) {
         AlertDialog(
             onDismissRequest = { showAddDialog = false },
             title = {
                 Text(
                     text = "إنشاء تصنيف مخصص جديد",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = TextPrimary,
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     item {
@@ -229,10 +217,10 @@ fun CustomCategoriesScreen(
                             label = { Text("اسم التصنيف (مثال: أصدقاء الجامعة)") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = PrimaryAccent,
-                                unfocusedBorderColor = CardBorderGlass,
+                                unfocusedBorderColor = CardBorderSubtle,
                                 focusedLabelColor = PrimaryAccentLight,
                                 unfocusedLabelColor = TextSecondary,
                                 focusedTextColor = TextPrimary,
@@ -242,16 +230,16 @@ fun CustomCategoriesScreen(
                     }
 
                     item {
-                        Text(text = "إضافة الكلمات والتلميحات للجاسوس:", style = MaterialTheme.typography.titleMedium, color = PrimaryAccentLight)
+                        Text(text = "إضافة الكلمات والتلميحات:", style = MaterialTheme.typography.titleSmall, color = PrimaryAccentLight)
                     }
 
                     items(wordsList.size) { idx ->
                         Column(
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(DarkSurfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
-                                .padding(12.dp)
+                                .background(DarkSurfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .padding(10.dp)
                         ) {
                             OutlinedTextField(
                                 value = wordsList[idx].first,
@@ -263,10 +251,10 @@ fun CustomCategoriesScreen(
                                 label = { Text("الكلمة السرية ${idx + 1}") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(10.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = PrimaryAccent,
-                                    unfocusedBorderColor = CardBorderGlass,
+                                    unfocusedBorderColor = CardBorderSubtle,
                                     focusedTextColor = TextPrimary,
                                     unfocusedTextColor = TextPrimary
                                 )
@@ -282,10 +270,10 @@ fun CustomCategoriesScreen(
                                 label = { Text("تلميح الجاسوس (اختياري)") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(10.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = PrimaryAccent,
-                                    unfocusedBorderColor = CardBorderGlass,
+                                    unfocusedBorderColor = CardBorderSubtle,
                                     focusedTextColor = TextPrimary,
                                     unfocusedTextColor = TextPrimary
                                 )
@@ -297,13 +285,12 @@ fun CustomCategoriesScreen(
                         OutlinedButton(
                             onClick = { wordsList = wordsList + ("" to "") },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryAccentLight),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryAccentLight)
                         ) {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text(text = "إضافة كلمة أخرى")
+                            Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "إضافة كلمة أخرى", style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
@@ -320,9 +307,9 @@ fun CustomCategoriesScreen(
                     },
                     enabled = categoryName.isNotBlank() && wordsList.any { it.first.isNotBlank() },
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryAccent, contentColor = TextPrimary),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text(text = "حفظ التصنيف", fontWeight = FontWeight.Bold)
+                    Text(text = "حفظ التصنيف", fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
@@ -331,9 +318,7 @@ fun CustomCategoriesScreen(
                 }
             },
             containerColor = DarkSurface,
-            shape = RoundedCornerShape(28.dp)
+            shape = RoundedCornerShape(24.dp)
         )
     }
 }
-
-

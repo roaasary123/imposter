@@ -16,8 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -50,7 +49,7 @@ fun DiscussionScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "مرحلة النقاش والأسئلة",
+                        text = "مرحلة النقاش",
                         style = MaterialTheme.typography.titleLarge,
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold
@@ -62,55 +61,41 @@ fun DiscussionScreen(
         bottomBar = {
             Surface(
                 color = DarkSurface,
-                shadowElevation = 16.dp,
-                border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass)
+                tonalElevation = 0.dp
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     Button(
                         onClick = onProceedToVoting,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(60.dp)
-                            .shadow(12.dp, RoundedCornerShape(20.dp), spotColor = PrimaryAccent)
+                            .height(52.dp)
                             .testTag("proceed_to_voting_button"),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
+                            containerColor = PrimaryAccent,
                             contentColor = TextPrimary
                         ),
-                        contentPadding = PaddingValues(),
-                        shape = RoundedCornerShape(20.dp)
+                        shape = RoundedCornerShape(14.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.horizontalGradient(
-                                        colors = listOf(PrimaryAccent, CyberCyan)
-                                    )
-                                ),
-                            contentAlignment = Alignment.Center
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.HowToVote,
-                                    contentDescription = null,
-                                    tint = TextPrimary,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "الانتقال للتصويت والتخمين",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextPrimary
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Default.HowToVote,
+                                contentDescription = null,
+                                tint = TextPrimary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                text = "الانتقال للتصويت والتخمين",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
+                            )
                         }
                     }
                 }
@@ -124,45 +109,43 @@ fun DiscussionScreen(
                 .padding(padding)
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            // 1. Starter Player Announcement Banner
             if (starterPlayer != null) {
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = PrimaryAccent.copy(alpha = 0.15f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
+                    shape = RoundedCornerShape(14.dp),
+                    color = PrimaryAccent.copy(alpha = 0.1f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(14.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(48.dp)
-                                .background(PrimaryAccent, CircleShape),
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(PrimaryAccent),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
                                 tint = TextPrimary,
-                                modifier = Modifier.size(26.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
 
                         Column {
                             Text(
                                 text = "اللاعب البادئ بطرح الأسئلة:",
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodySmall,
                                 color = TextSecondary
                             )
                             Text(
                                 text = starterPlayer.name,
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -171,31 +154,29 @@ fun DiscussionScreen(
                 }
             }
 
-            // 2. Timer Card Section
             Surface(
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(20.dp),
                 color = DarkSurface,
-                border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier.padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Timer,
                             contentDescription = null,
                             tint = PrimaryAccentLight,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                         Text(
                             text = "مؤقت النقاش",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary
                         )
                     }
@@ -203,60 +184,58 @@ fun DiscussionScreen(
                     Text(
                         text = timeFormatted,
                         style = MaterialTheme.typography.displayLarge.copy(
-                            fontSize = 54.sp,
-                            fontWeight = FontWeight.Black
+                            fontSize = 48.sp,
+                            fontWeight = FontWeight.Bold
                         ),
                         color = if (timerSeconds <= 30 && timerSeconds > 0) ImposterRed else PrimaryAccentLight,
                         textAlign = TextAlign.Center
                     )
 
-                    // Timer Controls
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Play/Pause Button
                         IconButton(
                             onClick = { if (isTimerRunning) onPauseTimer() else onStartTimer() },
                             modifier = Modifier
-                                .size(56.dp)
-                                .background(PrimaryAccent, CircleShape)
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(PrimaryAccent)
                         ) {
                             Icon(
                                 imageVector = if (isTimerRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                                 contentDescription = if (isTimerRunning) "إيقاف مؤقت" else "تشغيل",
                                 tint = TextPrimary,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         }
 
-                        // Reset Button
                         IconButton(
                             onClick = onResetTimer,
                             modifier = Modifier
-                                .size(44.dp)
-                                .background(DarkSurfaceVariant, CircleShape)
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(DarkSurfaceVariant)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Refresh,
                                 contentDescription = "إعادة ضبط",
-                                tint = TextPrimary
+                                tint = TextPrimary,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
 
-                        // Add +1 Minute Button
                         OutlinedButton(
                             onClick = onAddTimerMinute,
-                            shape = RoundedCornerShape(20.dp),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
+                            shape = RoundedCornerShape(14.dp),
                             colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
-                                Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Text(text = "1 دقيقة", style = MaterialTheme.typography.labelLarge)
+                                Icon(imageVector = Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Text(text = "1 د", style = MaterialTheme.typography.labelMedium)
                             }
                         }
                     }
@@ -265,5 +244,3 @@ fun DiscussionScreen(
         }
     }
 }
-
-

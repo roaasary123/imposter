@@ -15,8 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -45,27 +44,27 @@ fun HomeScreen(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 40.dp),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 60.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Minimal Header Section
             item {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(top = 20.dp)
+                    modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(72.dp)
-                            .background(PrimaryAccent.copy(alpha = 0.15f), CircleShape),
+                            .size(64.dp)
+                            .clip(CircleShape)
+                            .background(PrimaryAccent.copy(alpha = 0.12f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Security,
                             contentDescription = null,
                             tint = PrimaryAccentLight,
-                            modifier = Modifier.size(38.dp)
+                            modifier = Modifier.size(34.dp)
                         )
                     }
 
@@ -73,16 +72,12 @@ fun HomeScreen(
 
                     Text(
                         text = "لعبة الجاسوس",
-                        style = MaterialTheme.typography.displayLarge.copy(
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = (-0.5).sp
-                        ),
+                        style = MaterialTheme.typography.displayLarge,
                         color = TextPrimary,
                         textAlign = TextAlign.Center
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
                         text = "توزيع الأدوار والتخمين الذكي",
@@ -93,204 +88,167 @@ fun HomeScreen(
                 }
             }
 
-            // Main Actions Buttons
             item {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Start Game Button
                     Button(
                         onClick = { onNavigateTo(AppScreen.SETUP) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(58.dp)
-                            .shadow(12.dp, RoundedCornerShape(18.dp), spotColor = PrimaryAccent)
+                            .height(52.dp)
                             .testTag("start_game_button"),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
+                            containerColor = PrimaryAccent,
                             contentColor = TextPrimary
                         ),
-                        contentPadding = PaddingValues(),
-                        shape = RoundedCornerShape(18.dp)
+                        shape = RoundedCornerShape(14.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.horizontalGradient(
-                                        colors = listOf(PrimaryAccent, CyberCyan)
-                                    )
-                                ),
-                            contentAlignment = Alignment.Center
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.PlayArrow,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(26.dp),
-                                    tint = TextPrimary
-                                )
-                                Text(
-                                    text = "بدء لعبة جديدة",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextPrimary
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = TextPrimary
+                            )
+                            Text(
+                                text = "بدء لعبة جديدة",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
+                            )
                         }
                     }
 
-                    // Custom Categories Glass Button
                     Surface(
                         onClick = { onNavigateTo(AppScreen.CUSTOM_CATEGORIES) },
-                        shape = RoundedCornerShape(18.dp),
+                        shape = RoundedCornerShape(14.dp),
                         color = DarkSurface,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(54.dp)
+                            .height(50.dp)
                             .testTag("custom_categories_button")
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 20.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.AddCard,
                                 contentDescription = null,
                                 tint = PrimaryAccentLight,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                             Text(
                                 text = "التصنيفات والكلمات المخصصة",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.bodyLarge,
                                 color = TextPrimary,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
 
-                    // How to Play Rules Glass Button
                     Surface(
                         onClick = { showHowToPlay = true },
-                        shape = RoundedCornerShape(18.dp),
+                        shape = RoundedCornerShape(14.dp),
                         color = DarkSurface,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(54.dp)
+                            .height(50.dp)
                             .testTag("how_to_play_button")
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 20.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.HelpOutline,
                                 contentDescription = null,
                                 tint = PrimaryAccentLight,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                             Text(
                                 text = "طريقة اللعب والقوانين",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.bodyLarge,
                                 color = TextPrimary,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Medium
                             )
                         }
                     }
                 }
             }
 
-            // Leaderboard Glass Card (If players have scores)
             if (players.any { it.score > 0 }) {
                 item {
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Leaderboard,
-                                contentDescription = null,
-                                tint = GoldLight,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Text(
-                                text = "جدول النقاط الحالي",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = TextPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+                        Text(
+                            text = "جدول النقاط",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = TextPrimary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 10.dp)
+                        )
 
                         Surface(
-                            shape = RoundedCornerShape(20.dp),
+                            shape = RoundedCornerShape(16.dp),
                             color = DarkSurface,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(
-                                modifier = Modifier.padding(18.dp),
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                players.sortedByDescending { it.score }.forEachIndexed { idx, player ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
+                                players.sortedByDescending { it.score }
+                                    .forEachIndexed { idx, player ->
                                         Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(28.dp)
-                                                    .background(
-                                                        if (idx == 0) GoldPrimary else DarkSurfaceVariant,
-                                                        CircleShape
-                                                    ),
-                                                contentAlignment = Alignment.Center
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(10.dp)
                                             ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(26.dp)
+                                                        .clip(CircleShape)
+                                                        .background(
+                                                            if (idx == 0) GoldPrimary else DarkSurfaceVariant
+                                                        ),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = "${idx + 1}",
+                                                        style = MaterialTheme.typography.labelMedium,
+                                                        color = if (idx == 0) DarkBackground else TextPrimary,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
                                                 Text(
-                                                    text = "${idx + 1}",
-                                                    style = MaterialTheme.typography.labelLarge,
-                                                    color = if (idx == 0) DarkBackground else TextPrimary,
-                                                    fontWeight = FontWeight.Bold
+                                                    text = player.name,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    color = TextPrimary,
+                                                    fontWeight = FontWeight.Medium
                                                 )
                                             }
+
                                             Text(
-                                                text = player.name,
-                                                style = MaterialTheme.typography.bodyLarge,
-                                                color = TextPrimary,
+                                                text = "${player.score} نقطة",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = GoldLight,
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                         }
-
-                                        Surface(
-                                            color = DarkSurfaceVariant,
-                                            shape = RoundedCornerShape(10.dp)
-                                        ) {
-                                            Text(
-                                                text = "${player.score} نقطة",
-                                                style = MaterialTheme.typography.labelLarge,
-                                                color = GoldLight,
-                                                fontWeight = FontWeight.Bold,
-                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                                            )
-                                        }
                                     }
-                                }
                             }
                         }
                     }
@@ -299,5 +257,3 @@ fun HomeScreen(
         }
     }
 }
-
-

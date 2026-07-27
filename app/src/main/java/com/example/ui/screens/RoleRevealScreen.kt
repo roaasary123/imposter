@@ -1,8 +1,5 @@
 package com.example.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,14 +20,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.model.Player
 import com.example.model.PlayerRole
 import com.example.ui.theme.*
@@ -71,7 +65,6 @@ fun RoleRevealScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Top Progress Bar & Instruction
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -80,54 +73,54 @@ fun RoleRevealScreen(
                     progress = { (currentIndex + 1).toFloat() / totalPlayers },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp)),
                     color = PrimaryAccent,
                     trackColor = DarkSurfaceVariant
                 )
 
                 Text(
                     text = "اللاعب ${currentIndex + 1} من $totalPlayers",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Surface(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(14.dp),
                     color = DarkSurface,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorderGlass),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(14.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(48.dp)
-                                .background(PrimaryAccent.copy(alpha = 0.2f), CircleShape),
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(PrimaryAccent.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
                                 tint = PrimaryAccentLight,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
 
                         Column {
                             Text(
                                 text = "سلم الهاتف إلى:",
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodySmall,
                                 color = TextSecondary
                             )
                             Text(
                                 text = currentPlayer.name,
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
@@ -136,48 +129,47 @@ fun RoleRevealScreen(
                 }
             }
 
-            // Center Interactive Card Flip
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(340.dp)
-                    .clip(RoundedCornerShape(28.dp))
+                    .height(320.dp)
+                    .clip(RoundedCornerShape(24.dp))
                     .background(if (isCardFlipped) DarkSurface else DarkSurfaceVariant)
                     .border(
-                        width = 2.dp,
+                        width = 1.5.dp,
                         color = if (isCardFlipped) {
                             if (currentPlayer.role is PlayerRole.Imposter) ImposterRed else InnocentGreen
-                        } else CardBorderGlass,
-                        shape = RoundedCornerShape(28.dp)
+                        } else CardBorderSubtle,
+                        shape = RoundedCornerShape(24.dp)
                     )
                     .clickable { onToggleCardFlipped() }
                     .testTag("role_reveal_card")
-                    .padding(24.dp),
+                    .padding(20.dp),
                 contentAlignment = Alignment.Center
             ) {
                 if (!isCardFlipped) {
-                    // Unrevealed Cover
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(76.dp)
-                                .background(PrimaryAccent.copy(alpha = 0.2f), CircleShape),
+                                .size(64.dp)
+                                .clip(CircleShape)
+                                .background(PrimaryAccent.copy(alpha = 0.12f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Lock,
                                 contentDescription = null,
                                 tint = PrimaryAccentLight,
-                                modifier = Modifier.size(38.dp)
+                                modifier = Modifier.size(30.dp)
                             )
                         }
 
                         Text(
                             text = "انقر لكشف دورك والكلمة السرية",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             color = TextPrimary,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
@@ -185,61 +177,60 @@ fun RoleRevealScreen(
 
                         Text(
                             text = "تأكد من عدم رؤية بقية اللاعبين للشاشة!",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             color = TextSecondary,
                             textAlign = TextAlign.Center
                         )
                     }
                 } else {
-                    // Revealed Secret Role Content
                     when (val role = currentPlayer.role) {
                         is PlayerRole.Innocent -> {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(14.dp)
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Surface(
                                     color = InnocentGreenContainer,
-                                    shape = RoundedCornerShape(20.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, InnocentGreen.copy(alpha = 0.5f))
+                                    shape = RoundedCornerShape(14.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, InnocentGreen.copy(alpha = 0.4f))
                                 ) {
                                     Text(
                                         text = "أنت بريء",
                                         style = MaterialTheme.typography.titleMedium,
                                         color = InnocentGreen,
                                         fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 6.dp)
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 5.dp)
                                     )
                                 }
 
                                 Text(
                                     text = "التصنيف: ${role.categoryName}",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.bodySmall,
                                     color = TextSecondary
                                 )
 
                                 Surface(
                                     color = DarkBackground,
-                                    shape = RoundedCornerShape(20.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, InnocentGreen.copy(alpha = 0.5f))
+                                    shape = RoundedCornerShape(16.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, InnocentGreen.copy(alpha = 0.3f))
                                 ) {
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(18.dp),
+                                            .padding(16.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
                                             text = "الكلمة السرية:",
-                                            style = MaterialTheme.typography.bodyMedium,
+                                            style = MaterialTheme.typography.bodySmall,
                                             color = TextSecondary
                                         )
-                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = role.secretWord,
-                                            style = MaterialTheme.typography.displayMedium,
+                                            style = MaterialTheme.typography.headlineMedium,
                                             color = InnocentGreen,
-                                            fontWeight = FontWeight.Black,
+                                            fontWeight = FontWeight.Bold,
                                             textAlign = TextAlign.Center
                                         )
                                     }
@@ -257,57 +248,57 @@ fun RoleRevealScreen(
                         is PlayerRole.Imposter -> {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(14.dp)
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Surface(
                                     color = ImposterRedContainer,
-                                    shape = RoundedCornerShape(20.dp),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, ImposterRed.copy(alpha = 0.5f))
+                                    shape = RoundedCornerShape(14.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, ImposterRed.copy(alpha = 0.4f))
                                 ) {
                                     Text(
                                         text = "أنت الجاسوس!",
                                         style = MaterialTheme.typography.titleLarge,
                                         color = ImposterRed,
-                                        fontWeight = FontWeight.Black,
-                                        modifier = Modifier.padding(horizontal = 22.dp, vertical = 8.dp)
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
                                     )
                                 }
 
                                 if (role.hint != null) {
                                     Surface(
-                                        color = GoldPrimary.copy(alpha = 0.15f),
-                                        shape = RoundedCornerShape(20.dp),
-                                        border = androidx.compose.foundation.BorderStroke(1.dp, GoldPrimary.copy(alpha = 0.8f))
+                                        color = GoldPrimary.copy(alpha = 0.12f),
+                                        shape = RoundedCornerShape(16.dp),
+                                        border = androidx.compose.foundation.BorderStroke(1.dp, GoldPrimary.copy(alpha = 0.5f))
                                     ) {
                                         Column(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(16.dp),
+                                                .padding(14.dp),
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Lightbulb,
                                                     contentDescription = null,
                                                     tint = GoldLight,
-                                                    modifier = Modifier.size(18.dp)
+                                                    modifier = Modifier.size(14.dp)
                                                 )
                                                 Text(
                                                     text = "تلميح خاص بك:",
-                                                    style = MaterialTheme.typography.labelLarge,
+                                                    style = MaterialTheme.typography.labelMedium,
                                                     color = GoldLight,
                                                     fontWeight = FontWeight.Bold
                                                 )
                                             }
-                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Spacer(modifier = Modifier.height(4.dp))
                                             Text(
                                                 text = role.hint,
-                                                style = MaterialTheme.typography.bodyLarge,
+                                                style = MaterialTheme.typography.bodyMedium,
                                                 color = TextPrimary,
-                                                fontWeight = FontWeight.SemiBold,
+                                                fontWeight = FontWeight.Medium,
                                                 textAlign = TextAlign.Center
                                             )
                                         }
@@ -315,7 +306,7 @@ fun RoleRevealScreen(
                                 } else {
                                     Text(
                                         text = "لا توجد تلميحات هذه الجولة! حاول التظاهر بمعرفة الكلمة والاندماج مع الآخرين.",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        style = MaterialTheme.typography.bodySmall,
                                         color = TextSecondary,
                                         textAlign = TextAlign.Center
                                     )
@@ -327,45 +318,28 @@ fun RoleRevealScreen(
                 }
             }
 
-            // Bottom CTA Button
             Button(
                 onClick = onConfirmAndNext,
                 enabled = isCardFlipped,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp)
-                    .shadow(12.dp, RoundedCornerShape(20.dp), spotColor = PrimaryAccent)
+                    .height(52.dp)
                     .testTag("confirm_role_button"),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
+                    containerColor = if (isCardFlipped) PrimaryAccent else DarkSurfaceVariant,
                     contentColor = TextPrimary,
                     disabledContainerColor = DarkSurfaceVariant,
                     disabledContentColor = TextMuted
                 ),
-                contentPadding = PaddingValues(),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(14.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            if (isCardFlipped)
-                                Brush.horizontalGradient(listOf(PrimaryAccent, CyberCyan))
-                            else
-                                Brush.horizontalGradient(listOf(DarkSurfaceVariant, DarkSurfaceVariant))
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (currentIndex < totalPlayers - 1) "إخفاء وتمرير الهاتف للاعب التالي" else "إخفاء وبدء جولة النقاش",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isCardFlipped) TextPrimary else TextMuted
-                    )
-                }
+                Text(
+                    text = if (currentIndex < totalPlayers - 1) "إخفاء وتمرير الهاتف للاعب التالي" else "إخفاء وبدء جولة النقاش",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isCardFlipped) TextPrimary else TextMuted
+                )
             }
         }
     }
 }
-
-
