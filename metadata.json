@@ -1,6 +1,0 @@
-{
-  "name": "لعبة الجاسوس",
-  "description": "لعبة الجاسوس العربية - لعبة ذكاء وغموض وتخمين للأصدقاء والعائلة مع خيار التلميح وتصميم فاخر هادئ.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
